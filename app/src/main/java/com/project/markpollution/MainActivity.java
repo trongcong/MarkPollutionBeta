@@ -88,9 +88,12 @@ public class MainActivity extends AppCompatActivity
 //    ClusterManager.OnClusterItemClickListener<PollutionPoint>,
 //    ClusterManager.OnClusterItemInfoWindowClickListener<PollutionPoint>
 
+    public static ArrayList<PollutionPoint> listPo;
     ClusterManager<PollutionPoint> ListItemsCluster;
     List<PollutionPoint> items;
-
+    LatLngBounds.Builder Lbuilder;
+    CameraUpdate cameraUpdate;
+    List<LatLng> latLngCamUpdateList;
     private NavigationView navigationView;
     private FloatingActionButton fabCheck, fabCheckSelect;
     private SupportMapFragment mapFragment;
@@ -98,7 +101,6 @@ public class MainActivity extends AppCompatActivity
     private LatLng latLong_my_location;
     private Spinner spnCate;
     private ImageView imgGetLocation;
-    public static ArrayList<PollutionPoint> listPo;
     private List<Category> listCate;
     private List<PollutionPoint> listPoByCateID;
     private List<PollutionPoint> listSeriousPo;
@@ -113,9 +115,23 @@ public class MainActivity extends AppCompatActivity
     private BottomSheetBehavior bottomSheetBehavior;
     private RecyclerView recyclerViewFeed;
 
-    LatLngBounds.Builder Lbuilder;
-    CameraUpdate cameraUpdate;
-    List<LatLng> latLngCamUpdateList;
+    public static boolean isLocationEnabled(Context context) {
+        int locationMode = 0;
+        String locationProviders;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            try {
+                locationMode = Settings.Secure.getInt(context.getContentResolver(),
+                        Settings.Secure.LOCATION_MODE);
+            } catch (Settings.SettingNotFoundException e) {
+                e.printStackTrace();
+            }
+            return locationMode != Settings.Secure.LOCATION_MODE_OFF;
+        } else {
+            locationProviders = Settings.Secure.getString(context.getContentResolver(),
+                    Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+            return !TextUtils.isEmpty(locationProviders);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -359,8 +375,6 @@ public class MainActivity extends AppCompatActivity
                             mMap.clear();
                             for (PollutionPoint po : listPoByCateID) {
                                 addMarker(mMap, po);
-//                                latLngCamUpdateList.add(new LatLng(po.getLat(), po.getLng()));
-//                                nearByMeCamUpdate(latLngCamUpdateList);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -389,8 +403,6 @@ public class MainActivity extends AppCompatActivity
                     googleMap.clear();
                     for (PollutionPoint po : listPo) {
                         addMarker(googleMap, po);
-//                        latLngCamUpdateList.add(new LatLng(po.getLat(), po.getLng()));
-//                        nearByMeCamUpdate(latLngCamUpdateList);
                     }
                 }
             }
@@ -529,24 +541,6 @@ public class MainActivity extends AppCompatActivity
         builder.create().show();
     }
 
-    public static boolean isLocationEnabled(Context context) {
-        int locationMode = 0;
-        String locationProviders;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            try {
-                locationMode = Settings.Secure.getInt(context.getContentResolver(),
-                        Settings.Secure.LOCATION_MODE);
-            } catch (Settings.SettingNotFoundException e) {
-                e.printStackTrace();
-            }
-            return locationMode != Settings.Secure.LOCATION_MODE_OFF;
-        } else {
-            locationProviders = Settings.Secure.getString(context.getContentResolver(),
-                    Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
-            return !TextUtils.isEmpty(locationProviders);
-        }
-    }
-
     @Override
     public void onInfoWindowClick(Marker marker) {
         Intent intent = new Intent(this, DetailReportActivity.class);
@@ -572,13 +566,11 @@ public class MainActivity extends AppCompatActivity
             // chỉnh khoảng cách trong cài đặt
             if (distance <= 5000) {
                 addMarker(mMap, po);
-//                latLngCamUpdateList.add(new LatLng(po.getLat(), po.getLng()));
                 Log.i("distance add", formatNumber(distance) + " - " + po.toString());
             } else {
                 Log.i("distance no add", formatNumber(distance) + " - " + po.toString());
             }
         }
-//        nearByMeCamUpdate(latLngCamUpdateList);
     }
 
     private void nearByMeCamUpdate(List<LatLng> latLngList) {
@@ -698,46 +690,4 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
     }
-
-//    @Override
-//    public boolean onClusterClick(Cluster<PollutionPoint> cluster) {
-//        // Show a toast with some info when the cluster is clicked.
-//        String Title = cluster.getItems().iterator().next().getTitle();
-//        Toast.makeText(this, cluster.getSize() + " (including " + Title + ")", Toast.LENGTH_SHORT).show();
-//
-//        // Zoom in the cluster. Need to create LatLngBounds and including all the cluster items
-//        // inside of bounds, then animate to center of the bounds.
-//
-//        // Create the builder to collect all essential cluster items for the bounds.
-//        LatLngBounds.Builder builder = LatLngBounds.builder();
-//        for (ClusterItem item : cluster.getItems()) {
-//            builder.include(item.getPosition());
-//        }
-//        // Get the LatLngBounds
-//        final LatLngBounds bounds = builder.build();
-//
-//        // Animate camera to the bounds
-//        try {
-//            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        return true;
-//    }
-//
-//    @Override
-//    public void onClusterInfoWindowClick(Cluster<PollutionPoint> cluster) {
-//
-//    }
-//
-//    @Override
-//    public boolean onClusterItemClick(PollutionPoint pollutionPoint) {
-//        return false;
-//    }
-//
-//    @Override
-//    public void onClusterItemInfoWindowClick(PollutionPoint pollutionPoint) {
-//
-//    }
 }
