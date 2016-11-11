@@ -1,104 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/container_feed"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="8dp">
 
     <TextView
-        android:text="This is the title"
+        android:id="@+id/textViewTimeFeed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/imageViewAvatarFeed"
-        android:layout_toEndOf="@+id/imageViewAvatarFeed"
-        android:layout_marginLeft="23dp"
-        android:layout_marginStart="23dp"
-        android:id="@+id/textViewTitleFeed"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textStyle="normal|bold"
-        android:textColor="@color/cast_intro_overlay_background_color"/>
-
-    <TextView
-        android:text="hh:mm:ss dd/MM/yyyy"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textViewTitleFeed"
         android:layout_alignLeft="@+id/textViewTitleFeed"
         android:layout_alignStart="@+id/textViewTitleFeed"
-        android:id="@+id/textViewTimeFeed"/>
+        android:layout_below="@+id/textViewTitleFeed"
+        android:text="hh:mm:ss dd/MM/yyyy" />
 
     <ImageView
+        android:id="@+id/imageViewCateFeed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@android:drawable/sym_def_app_icon"
-        android:id="@+id/imageViewAvatarFeed"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"/>
-
-    <TextView
-        android:text="This is the description This is the description This is the description This is the description This is the description This is the description This is the description"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/imageViewAvatarFeed"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="13dp"
-        android:lines="3"
-        android:id="@+id/textViewDescFeed"/>
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:srcCompat="@android:drawable/sym_def_app_icon"
-        android:layout_below="@+id/textViewDescFeed"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/imageViewPictureFeed"
-        android:layout_marginTop="8dp"/>
+        android:layout_alignParentTop="true"
+        app:srcCompat="@android:drawable/sym_def_app_icon" />
 
     <TextView
-        android:text="999"
+        android:id="@+id/textViewTitleFeed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/imageViewPictureFeed"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="11dp"
-        android:id="@+id/textViewRateFeed"
-        android:textStyle="normal|italic"/>
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="4dp"
+        android:layout_toEndOf="@+id/imageViewCateFeed"
+        android:layout_toRightOf="@+id/imageViewCateFeed"
+        android:text="This is the title"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/cast_intro_overlay_background_color"
+        android:textStyle="normal|bold" />
 
     <ImageView
+        android:id="@+id/imageViewPictureFeed"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/imageViewCateFeed"
+        app:srcCompat="@android:drawable/sym_def_app_icon" />
+
+    <TextView
+        android:id="@+id/textViewDescFeed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/ic_rate"
+        android:layout_below="@+id/textViewTimeFeed"
+        android:layout_marginRight="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_toLeftOf="@+id/imageViewPictureFeed"
+        android:layout_toStartOf="@+id/imageViewPictureFeed"
+        android:lines="3"
+        android:text="This is the description This is the description This is the description This is the description This is the description This is the description This is the description" />
+
+    <TextView
+        android:id="@+id/textViewRateFeed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:layout_below="@+id/imageViewPictureFeed"
+        android:layout_marginTop="4dp"
+        android:text="999"
+        android:textStyle="normal|italic" />
+
+    <ImageView
+        android:id="@+id/imageViewRateFeed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imageViewPictureFeed"
+        android:layout_marginRight="4dp"
         android:layout_toLeftOf="@+id/textViewRateFeed"
         android:layout_toStartOf="@+id/textViewRateFeed"
-        android:id="@+id/imageViewRateFeed"
-        android:layout_marginRight="4dp"/>
+        app:srcCompat="@drawable/ic_rate" />
 
     <TextView
-        android:text="999"
+        android:id="@+id/textViewCommentFeed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/textViewRateFeed"
+        android:layout_marginEnd="19dp"
+        android:layout_marginRight="19dp"
         android:layout_toLeftOf="@+id/imageViewRateFeed"
         android:layout_toStartOf="@+id/imageViewRateFeed"
-        android:layout_marginRight="19dp"
-        android:layout_marginEnd="19dp"
-        android:id="@+id/textViewCommentFeed"
-        android:textStyle="normal|italic"/>
+        android:text="999"
+        android:textStyle="normal|italic" />
 
     <ImageView
+        android:id="@+id/imageViewCommentFeed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/ic_comment"
         android:layout_below="@+id/imageViewPictureFeed"
+        android:layout_marginRight="4dp"
         android:layout_toLeftOf="@+id/textViewCommentFeed"
         android:layout_toStartOf="@+id/textViewCommentFeed"
-        android:id="@+id/imageViewCommentFeed"
-        android:layout_marginRight="4dp"/>
+        app:srcCompat="@drawable/ic_comment" />
 
 </RelativeLayout>

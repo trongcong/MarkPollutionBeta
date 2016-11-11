@@ -5,47 +5,47 @@
     android:layout_height="wrap_content">
 
     <ImageView
+        android:id="@+id/imageViewAvatarComment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/ic_avatar"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:id="@+id/imageViewAvatarComment" />
+        android:layout_alignParentTop="true"
+        app:srcCompat="@drawable/ic_avatar" />
 
     <TextView
-        android:text="Hung Tong Phuoc"
+        android:id="@+id/textViewNameComment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/imageViewAvatarComment"
-        android:layout_toRightOf="@+id/imageViewAvatarComment"
+        android:layout_marginLeft="8dp"
         android:layout_toEndOf="@+id/imageViewAvatarComment"
-        android:id="@+id/textViewNameComment"
+        android:layout_toRightOf="@+id/imageViewAvatarComment"
+        android:text="Hung Tong Phuoc"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Small"
-        android:textStyle="normal|bold"
         android:textColor="@color/cast_expanded_controller_background_color"
-        android:layout_marginLeft="8dp"/>
+        android:textStyle="normal|bold" />
 
     <TextView
-        android:text="12:03 22/10/2016"
+        android:id="@+id/textViewTimeComment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/textViewNameComment"
-        android:layout_toRightOf="@+id/textViewNameComment"
-        android:layout_toEndOf="@+id/textViewNameComment"
         android:layout_marginLeft="13dp"
         android:layout_marginStart="13dp"
-        android:id="@+id/textViewTimeComment"
+        android:layout_toEndOf="@+id/textViewNameComment"
+        android:layout_toRightOf="@+id/textViewNameComment"
+        android:text="12:03 22/10/2016"
         android:textStyle="normal|italic" />
 
     <TextView
+        android:id="@+id/textViewComment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:id="@+id/textViewComment"
-        android:text="I have seen this point. It is very pollution"
-        android:layout_below="@+id/imageViewAvatarComment"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/imageViewAvatarComment"
+        android:layout_marginTop="4dp"
+        android:text="I have seen this point. It is very pollution" />
 
 </RelativeLayout>

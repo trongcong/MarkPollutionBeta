@@ -3,8 +3,8 @@ package com.project.markpollution;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -27,6 +27,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.project.markpollution.CustomAdapter.CircleTransform;
 import com.project.markpollution.CustomAdapter.CommentRecyclerViewAdapter;
@@ -52,6 +53,7 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
     private RatingBar ratingBar;
     private TextView tvTitle, tvDesc, tvRate, tvTime, tvEmail, tvCate;
     private EditText etComment;
+    private String title;   // title of marker
     private RecyclerView recyclerViewComment;
     private String url_RetrieveUserById = "http://indi.com.vn/dev/markpollution/RetrieveUserById.php?id_user=";
     private String url_InsertComment = "http://indi.com.vn/dev/markpollution/InsertComment.php";
@@ -104,7 +106,10 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
         tvEmail = (TextView) findViewById(R.id.textViewEmailDetail);
         tvCate = (TextView) findViewById(R.id.textViewCategoryDetail);
         etComment = (EditText) findViewById(R.id.editTextComment);
+
         recyclerViewComment = (RecyclerView) findViewById(R.id.recyclerViewComment);
+        LinearLayoutManager layout = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        recyclerViewComment.setLayoutManager(layout);
 
         mapFragment.getMapAsync(this);
     }
@@ -115,13 +120,13 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
 
         String id_user = "";
         String id_cate = "";
-        String title = "";
+        title = "";
         String desc = "";
         String image = "";
         String time = "";
 
-        for(PollutionPoint po: MainActivity.listPo){
-            if(po.getId().equals(id_po)){
+        for (PollutionPoint po : MainActivity.listPo) {
+            if (po.getId().equals(id_po)) {
                 id_user = po.getId_user();
                 id_cate = po.getId_cate();
                 lat = po.getLat();
@@ -148,7 +153,7 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
         tvCate.setText(getCategoryName(Integer.parseInt(id_cate)));
     }
 
-    private String formatDateTime(String time){
+    private String formatDateTime(String time) {
         SimpleDateFormat originFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         SimpleDateFormat resultFormat = new SimpleDateFormat("hh:mm:ss dd/MM/yyyy");
 
@@ -162,20 +167,20 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
         return resultFormat.format(datetime);
     }
 
-    private void setEmailnAvatar(String UserID){
+    private void setEmailnAvatar(String UserID) {
         String finalUrl = url_RetrieveUserById + UserID;
         JsonObjectRequest objReq = new JsonObjectRequest(Request.Method.GET, finalUrl, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
-                    if(response.getString("status").equals("success")){
+                    if (response.getString("status").equals("success")) {
                         JSONArray arr = response.getJSONArray("response");
                         JSONObject user = arr.getJSONObject(0);
                         String email = user.getString("email");
                         String avatar = user.getString("avatar");
 
                         tvEmail.setText(email);
-                        Picasso.with(DetailReportActivity.this).load(Uri.parse(avatar)).resize(70,70).transform(new CircleTransform()).into(ivAvatar);
+                        Picasso.with(DetailReportActivity.this).load(Uri.parse(avatar)).resize(70, 70).transform(new CircleTransform()).into(ivAvatar);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -191,17 +196,17 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
         Volley.newRequestQueue(this).add(objReq);
     }
 
-    private String getCategoryName(int CateID){
+    private String getCategoryName(int CateID) {
         String value = "";
-        switch (CateID){
+        switch (CateID) {
             case 1:
                 value = "Plan Pollution";
                 break;
             case 2:
-                value = "Air Pollution";
+                value = "Water Pollution";
                 break;
             case 3:
-                value = "Water Pollution";
+                value = "Air Pollution";
                 break;
             case 4:
                 value = "Thermal Pollution";
@@ -220,21 +225,24 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
     public void onMapReady(GoogleMap googleMap) {
         gMap = googleMap;
         LatLng point = new LatLng(lat, lng);
-        gMap.addMarker(new MarkerOptions().position(point));
-        gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 16));
-        gMap.getUiSettings().setMapToolbarEnabled(false);
+        Marker marker = googleMap.addMarker(new MarkerOptions().position(point).title(title));
+        marker.showInfoWindow();
+
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 16));
+        googleMap.getUiSettings().setMapToolbarEnabled(false);
     }
 
     private void sendComment() {
         ivSendComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!etComment.getText().toString().isEmpty()){
+                if (!etComment.getText().toString().isEmpty()) {
                     StringRequest stringReq = new StringRequest(Request.Method.POST, url_InsertComment, new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
                             Toast.makeText(DetailReportActivity.this, response, Toast.LENGTH_SHORT).show();
                             etComment.setText(null);
+                            retrieveComments();
                         }
                     }, new Response.ErrorListener() {
                         @Override
@@ -243,7 +251,7 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
                             Log.e("Volley", error.getMessage());
                             etComment.setText(null);
                         }
-                    }){
+                    }) {
                         @Override
                         protected Map<String, String> getParams() throws AuthFailureError {
                             HashMap<String, String> params = new HashMap<>();
@@ -260,23 +268,24 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
         });
     }
 
-    private String getUserID(){
-        SharedPreferences sharedPreferences = getSharedPreferences("sharedpref_id_user",MODE_PRIVATE);
-        return sharedPreferences.getString("sharedpref_id_user","");
+    private String getUserID() {
+        SharedPreferences sharedPreferences = getSharedPreferences("sharedpref_id_user", MODE_PRIVATE);
+        return sharedPreferences.getString("sharedpref_id_user", "");
     }
 
-    private void retrieveComments(){
+    private void retrieveComments() {
         JsonObjectRequest objReq = new JsonObjectRequest(Request.Method.GET, url_RetrieveCommentById + id_po, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
-                    if(response.getString("status").equals("success")){
+                    if (response.getString("status").equals("success")) {
                         JSONArray arr = response.getJSONArray("response");
-                        for(int i=0; i<arr.length(); i++){
+                        listComment = new ArrayList<>();    // reinitialize list<Comment> when retrieve comments
+                        for (int i = 0; i < arr.length(); i++) {
                             JSONObject comment = arr.getJSONObject(i);
                             listComment.add(new Comment(comment.getString("id_po"), comment.getString("id_user"), comment.getString("comment"), comment.getString("time")));
-                            loadComments();
                         }
+                        loadComments();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -292,27 +301,25 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
         Volley.newRequestQueue(this).add(objReq);
     }
 
-    private void loadComments(){
-        LinearLayoutManager layout = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        recyclerViewComment.setLayoutManager(layout);
+    private void loadComments() {
         recyclerViewComment.setAdapter(new CommentRecyclerViewAdapter(this, listComment));
     }
 
-    private void checkUserRatedOrNotToInsertOrUpdate(){
+    private void checkUserRatedOrNotToInsertOrUpdate() {
         ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
             public void onRatingChanged(RatingBar ratingBar, final float rating, boolean fromUser) {
                 // if it's not the first time show rate ==> insert OR update
-                if(!isFirstTimeShowRate){
+                if (!isFirstTimeShowRate) {
                     // Check user has rated or not
                     String completed_urlCheckUserRatedOrNot = url_CheckUserRatedOrNot + getUserID() + "&id_po=" + id_po;
                     StringRequest strReq = new StringRequest(Request.Method.GET, completed_urlCheckUserRatedOrNot, new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            if(response.equals("User hasn't rated")){
+                            if (response.equals("User hasn't rated")) {
                                 // insert rate
                                 insertRate(rating);
-                            }else{
+                            } else {
                                 // edit rate
                                 updateRate(rating);
                             }
@@ -332,7 +339,7 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
         });
     }
 
-    private void insertRate(final float rate){
+    private void insertRate(final float rate) {
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url_InsertRate, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -345,13 +352,13 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
                 Toast.makeText(DetailReportActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.e("Volley", error.getMessage());
             }
-        }){
+        }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 HashMap<String, String> params = new HashMap<>();
                 params.put("id_po", id_po);
                 params.put("id_user", getUserID());
-                params.put("rate",Integer.toString((int)rate));
+                params.put("rate", Integer.toString((int) rate));
 
                 return params;
             }
@@ -360,7 +367,7 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
         Volley.newRequestQueue(DetailReportActivity.this).add(stringRequest);
     }
 
-    private void updateRate(final float rate){
+    private void updateRate(final float rate) {
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url_UpdateRate, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -373,13 +380,13 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
                 Toast.makeText(DetailReportActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.e("Volley", error.getMessage());
             }
-        }){
+        }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 HashMap<String, String> params = new HashMap<>();
                 params.put("id_po", id_po);
                 params.put("id_user", getUserID());
-                params.put("rate",Integer.toString((int)rate));
+                params.put("rate", Integer.toString((int) rate));
 
                 return params;
             }
@@ -393,7 +400,7 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
         StringRequest strReq = new StringRequest(Request.Method.GET, completed_url_RetrieveRateByUser, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                if(!response.equals("no row match")){
+                if (!response.equals("no row match")) {
                     isFirstTimeShowRate = true;
                     ratingBar.setRating(Float.valueOf(response));
                 }
@@ -409,7 +416,7 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
         Volley.newRequestQueue(DetailReportActivity.this).add(strReq);
     }
 
-    private void sumRate(){
+    private void sumRate() {
         StringRequest stringReq = new StringRequest(Request.Method.GET, url_SumRate + id_po, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -433,9 +440,9 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
                 StringRequest strReq = new StringRequest(Request.Method.POST, url_InsertSpam, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        if(response.equals("You have unchecked spam")){
+                        if (response.equals("You have unchecked spam")) {
                             setIconSpam(false);
-                        }else if(response.equals("Spam successful")){
+                        } else if (response.equals("Spam successful")) {
                             setIconSpam(true);
                         }
                         Toast.makeText(DetailReportActivity.this, response, Toast.LENGTH_SHORT).show();
@@ -446,7 +453,7 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
                         Toast.makeText(DetailReportActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
                         Log.e("Volley_insertSpam", error.getMessage());
                     }
-                }){
+                }) {
                     @Override
                     protected Map<String, String> getParams() throws AuthFailureError {
                         HashMap<String, String> params = new HashMap<>();
@@ -461,18 +468,18 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
         });
     }
 
-    private void setIconSpam(boolean spam){
-        if(spam){
+    private void setIconSpam(boolean spam) {
+        if (spam) {
             ivSpam.setImageResource(R.drawable.ic_spam);
-        }else{
+        } else {
             ivSpam.setImageResource(R.drawable.ic_spam_grey);
         }
     }
 
-    private void setIconResolve(boolean resolved){
-        if(resolved){
+    private void setIconResolve(boolean resolved) {
+        if (resolved) {
             ivResolved.setImageResource(R.drawable.ic_has_resolved);
-        }else{
+        } else {
             ivResolved.setImageResource(R.drawable.ic_has_resolved_grey);
         }
     }
@@ -482,9 +489,9 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
         StringRequest strReq = new StringRequest(Request.Method.GET, completed_url_CheckUserSpamOrNot, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                if(response.equals("User has checked spam")){
+                if (response.equals("User has checked spam")) {
                     setIconSpam(true);
-                }else if(response.equals("User hasn't checked spam")){
+                } else if (response.equals("User hasn't checked spam")) {
                     setIconSpam(false);
                 }
             }
@@ -498,16 +505,16 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
         Volley.newRequestQueue(DetailReportActivity.this).add(strReq);
     }
 
-    private void insertResolve(){
+    private void insertResolve() {
         ivResolved.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 StringRequest strReq = new StringRequest(Request.Method.POST, url_InsertResolve, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        if(response.equals("You have unchecked resolve")){
+                        if (response.equals("You have unchecked resolve")) {
                             setIconResolve(false);
-                        }else if(response.equals("Check resolved successful")){
+                        } else if (response.equals("Check resolved successful")) {
                             setIconResolve(true);
                         }
                         Toast.makeText(DetailReportActivity.this, response, Toast.LENGTH_SHORT).show();
@@ -518,7 +525,7 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
                         Toast.makeText(DetailReportActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
                         Log.e("Volley_InsertResolve", error.getMessage());
                     }
-                }){
+                }) {
                     @Override
                     protected Map<String, String> getParams() throws AuthFailureError {
                         HashMap<String, String> params = new HashMap<>();
@@ -538,9 +545,9 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
         StringRequest strReq = new StringRequest(Request.Method.GET, completed_url_CheckUserCheckResolveorNot, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                if(response.equals("User has checked resolve")){
+                if (response.equals("User has checked resolve")) {
                     setIconResolve(true);
-                }else if(response.equals("User hasn't checked resolve")){
+                } else if (response.equals("User hasn't checked resolve")) {
                     setIconResolve(false);
                 }
             }

@@ -2,9 +2,9 @@ package com.project.markpollution;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -72,58 +72,60 @@ public class SigninActivity extends AppCompatActivity implements GoogleApiClient
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 111){
+        if (requestCode == 111) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if(result.isSuccess()){
+            if (result.isSuccess()) {
                 final GoogleSignInAccount acc = result.getSignInAccount();
 
                 String urlCheckUserExistOrNot = url_checkUserByEmail + acc.getEmail();
                 StringRequest stringReq = new StringRequest(Request.Method.GET, urlCheckUserExistOrNot, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        if(!response.equals("user doesn't exist")){
+                        if (!response.equals("user doesn't exist")) {
                             // Save id_user to SharedPreferences
                             saveUserIDtoSharedPreferences(null, response, true);
                             intent.putExtra("name", acc.getDisplayName());
                             intent.putExtra("email", acc.getEmail());
                             intent.putExtra("avatar", acc.getPhotoUrl().toString());
-                            startActivity(intent); finish();
-                        }else{
+                            startActivity(intent);
+                            finish();
+                        } else {
                             insertUser(acc.getDisplayName(), acc.getEmail(), acc.getPhotoUrl().toString());
                             intent.putExtra("name", acc.getDisplayName());
                             intent.putExtra("email", acc.getEmail());
                             intent.putExtra("avatar", acc.getPhotoUrl().toString());
-                            startActivity(intent); finish();
+                            startActivity(intent);
+                            finish();
                         }
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(SigninActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
-                        Log.e("Volley", error.getMessage());
+//                        Log.e("Volley", error.getMessage());
                     }
                 });
 
                 Volley.newRequestQueue(this).add(stringReq);
 
-            }else {
+            } else {
                 Toast.makeText(this, result.getStatus().toString(), Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    private void saveUserIDtoSharedPreferences(String email, final String id_user, boolean isUserExist){
-        if(isUserExist){
-            SharedPreferences sharedPreferences = getSharedPreferences("sharedpref_id_user",MODE_PRIVATE);
+    private void saveUserIDtoSharedPreferences(String email, final String id_user, boolean isUserExist) {
+        if (isUserExist) {
+            SharedPreferences sharedPreferences = getSharedPreferences("sharedpref_id_user", MODE_PRIVATE);
             SharedPreferences.Editor edit = sharedPreferences.edit();
             edit.putString("sharedpref_id_user", id_user);
             edit.commit();
-        }else{
+        } else {
             String urlCheck = url_checkUserByEmail + email;
             StringRequest stringReq = new StringRequest(Request.Method.GET, urlCheck, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    SharedPreferences sharedPreferences = getSharedPreferences("sharedpref_id_user",MODE_PRIVATE);
+                    SharedPreferences sharedPreferences = getSharedPreferences("sharedpref_id_user", MODE_PRIVATE);
                     SharedPreferences.Editor edit = sharedPreferences.edit();
                     edit.putString("sharedpref_id_user", response);
                     edit.commit();
@@ -139,13 +141,13 @@ public class SigninActivity extends AppCompatActivity implements GoogleApiClient
         }
     }
 
-    private void insertUser(final String name, final String email, final String avatar){
+    private void insertUser(final String name, final String email, final String avatar) {
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url_insertUser, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                if(response.equals("insert success")){
+                if (response.equals("insert success")) {
                     Toast.makeText(SigninActivity.this, "Account has registered successful", Toast.LENGTH_SHORT).show();
-                    saveUserIDtoSharedPreferences(email,null, false);
+                    saveUserIDtoSharedPreferences(email, null, false);
                 }
             }
         }, new Response.ErrorListener() {
@@ -154,10 +156,10 @@ public class SigninActivity extends AppCompatActivity implements GoogleApiClient
                 Toast.makeText(SigninActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.e("Volley", error.getMessage());
             }
-        }){
+        }) {
             @Override
-            protected Map<String,String> getParams() throws AuthFailureError {
-                Map<String,String> params = new HashMap<String, String>();
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
                 params.put("name_user", name);
                 params.put("email", email);
                 params.put("avatar", avatar);
@@ -176,7 +178,7 @@ public class SigninActivity extends AppCompatActivity implements GoogleApiClient
 
     }
 
-    private void getAllPollutionPoint(){
+    private void getAllPollutionPoint() {
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url_retrieve_pollutionPoint, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {

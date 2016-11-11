@@ -17,6 +17,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.maps.model.Marker;
 import com.project.markpollution.Interfaces.OnItemClickListener;
 import com.project.markpollution.Objects.PollutionPoint;
 import com.project.markpollution.R;
@@ -38,6 +39,7 @@ public class ReportMgrRecyclerViewAdapter extends RecyclerView.Adapter<ReportMgr
     private String url_CountCommentByPo = "http://indi.com.vn/dev/markpollution/CountCommentByPo.php?id_po=";
     private String url_SumRateByPo = "http://indi.com.vn/dev/markpollution/SumRateByPo.php?id_po=";
     private OnItemClickListener onItemClickListener;    // interface to store PollutionPoint object
+    private Marker marker;
 
     public ReportMgrRecyclerViewAdapter(Context context, List<PollutionPoint> listPo) {
         this.context = context;
@@ -82,24 +84,7 @@ public class ReportMgrRecyclerViewAdapter extends RecyclerView.Adapter<ReportMgr
         return listPo.size();
     }
 
-    class ReportRecyclerViewHolder extends RecyclerView.ViewHolder{
-        ImageView ivPicture;
-        TextView tvTitle, tvDesc, tvTime, tvRate, tvComment;
-        RelativeLayout container;
-
-        public ReportRecyclerViewHolder(View itemView) {
-            super(itemView);
-            ivPicture = (ImageView) itemView.findViewById(R.id.imageViewPicReportMgr);
-            tvTitle = (TextView) itemView.findViewById(R.id.textViewTitleReportMgr);
-            tvDesc = (TextView) itemView.findViewById(R.id.textViewDescReportMgr);
-            tvTime = (TextView) itemView.findViewById(R.id.textViewTimeReportMgr);
-            tvComment = (TextView) itemView.findViewById(R.id.textViewCommentReportMgr);
-            tvRate = (TextView) itemView.findViewById(R.id.textViewRateReportMgr);
-            container = (RelativeLayout) itemView.findViewById(R.id.container_reportMgr);
-        }
-    }
-
-    private String formatDateTime(String time){
+    private String formatDateTime(String time) {
         SimpleDateFormat originFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         SimpleDateFormat resultFormat = new SimpleDateFormat("hh:mm:ss dd/MM/yyyy");
 
@@ -113,12 +98,12 @@ public class ReportMgrRecyclerViewAdapter extends RecyclerView.Adapter<ReportMgr
         return resultFormat.format(datetime);
     }
 
-    private void setCountCommentByPo(String id_po, final TextView ivHolder){
+    private void setCountCommentByPo(String id_po, final TextView ivHolder) {
         StringRequest strReq = new StringRequest(Request.Method.GET, url_CountCommentByPo +
                 id_po, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                if(!response.equals("Count comment failure")){
+                if (!response.equals("Count comment failure")) {
                     ivHolder.setText(response);
                 }
             }
@@ -133,14 +118,17 @@ public class ReportMgrRecyclerViewAdapter extends RecyclerView.Adapter<ReportMgr
         Volley.newRequestQueue(context).add(strReq);
     }
 
-    private void setSumRateByPo(String id_po, final TextView tvHolder){
-        StringRequest strReq = new StringRequest(Request.Method.GET, url_SumRateByPo + id_po , new
+    private void setSumRateByPo(String id_po, final TextView tvHolder) {
+        StringRequest strReq = new StringRequest(Request.Method.GET, url_SumRateByPo + id_po, new
                 Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                tvHolder.setText(response);
-            }
-        }, new Response.ErrorListener() {
+                    @Override
+                    public void onResponse(String response) {
+                        if (response.isEmpty()) {
+                            tvHolder.setText("0");
+                        }
+                        tvHolder.setText(response);
+                    }
+                }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(context, error.getMessage(), Toast.LENGTH_SHORT).show();
@@ -151,7 +139,24 @@ public class ReportMgrRecyclerViewAdapter extends RecyclerView.Adapter<ReportMgr
         Volley.newRequestQueue(context).add(strReq);
     }
 
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener){
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
+    }
+
+    class ReportRecyclerViewHolder extends RecyclerView.ViewHolder {
+        ImageView ivPicture;
+        TextView tvTitle, tvDesc, tvTime, tvRate, tvComment;
+        RelativeLayout container;
+
+        public ReportRecyclerViewHolder(View itemView) {
+            super(itemView);
+            ivPicture = (ImageView) itemView.findViewById(R.id.imageViewPicReportMgr);
+            tvTitle = (TextView) itemView.findViewById(R.id.textViewTitleReportMgr);
+            tvDesc = (TextView) itemView.findViewById(R.id.textViewDescReportMgr);
+            tvTime = (TextView) itemView.findViewById(R.id.textViewTimeReportMgr);
+            tvComment = (TextView) itemView.findViewById(R.id.textViewCommentReportMgr);
+            tvRate = (TextView) itemView.findViewById(R.id.textViewRateReportMgr);
+            container = (RelativeLayout) itemView.findViewById(R.id.container_reportMgr);
+        }
     }
 }

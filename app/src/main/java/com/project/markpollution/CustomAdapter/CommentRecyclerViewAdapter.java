@@ -34,10 +34,10 @@ import java.util.List;
 
 public class CommentRecyclerViewAdapter extends RecyclerView.Adapter<CommentRecyclerViewAdapter.CommentRecyclerViewHolder> {
     private List<Comment> listComment;
-//    private List<User> listUser = new ArrayList<>();
+    //    private List<User> listUser = new ArrayList<>();
     private Context mContext;
     private String id_po;
-//    private String url_RetrieveUserByComment = "http://2dev4u.com/dev/markpollution/RetrieveUserByComment.php?id_po=";
+    //    private String url_RetrieveUserByComment = "http://2dev4u.com/dev/markpollution/RetrieveUserByComment.php?id_po=";
     private String url_RetrieveUserById = "http://indi.com.vn/dev/markpollution/RetrieveUserById.php?id_user=";
 
     public CommentRecyclerViewAdapter(Context mContext, List<Comment> listComment/*, String id_po*/) {
@@ -68,19 +68,7 @@ public class CommentRecyclerViewAdapter extends RecyclerView.Adapter<CommentRecy
         return listComment.size();
     }
 
-    class CommentRecyclerViewHolder extends RecyclerView.ViewHolder{
-        ImageView ivAvatar;
-        TextView tvName, tvTime, tvComment;
-        public CommentRecyclerViewHolder(View itemView) {
-            super(itemView);
-            ivAvatar = (ImageView) itemView.findViewById(R.id.imageViewAvatarComment);
-            tvName = (TextView) itemView.findViewById(R.id.textViewNameComment);
-            tvTime = (TextView) itemView.findViewById(R.id.textViewTimeComment);
-            tvComment = (TextView) itemView.findViewById(R.id.textViewComment);
-        }
-    }
-
-    private String formatDateTime(String time){
+    private String formatDateTime(String time) {
         SimpleDateFormat originFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         SimpleDateFormat resultFormat = new SimpleDateFormat("hh:mm:ss dd/MM/yyyy");
 
@@ -94,19 +82,19 @@ public class CommentRecyclerViewAdapter extends RecyclerView.Adapter<CommentRecy
         return resultFormat.format(datetime);
     }
 
-    private void setAvatarAndName(String UserID, final ImageView avatar, final TextView name){
+    private void setAvatarAndName(String UserID, final ImageView avatar, final TextView name) {
         JsonObjectRequest objectRequest = new JsonObjectRequest(Request.Method.GET, url_RetrieveUserById + UserID, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
-                    if(response.getString("status").equals("success")){
+                    if (response.getString("status").equals("success")) {
                         JSONArray arr = response.getJSONArray("response");
                         JSONObject user = arr.getJSONObject(0);
                         String _avatar = user.getString("avatar");
                         String _name = user.getString("name_user");
 
                         // set avatar into holder
-                        Picasso.with(mContext).load(Uri.parse(_avatar)).resize(70,70).transform(new CircleTransform()).into(avatar);
+                        Picasso.with(mContext).load(Uri.parse(_avatar)).resize(70, 70).transform(new CircleTransform()).into(avatar);
                         // set name into holder
                         name.setText(_name);
                     }
@@ -122,6 +110,19 @@ public class CommentRecyclerViewAdapter extends RecyclerView.Adapter<CommentRecy
         });
 
         Volley.newRequestQueue(mContext).add(objectRequest);
+    }
+
+    class CommentRecyclerViewHolder extends RecyclerView.ViewHolder {
+        ImageView ivAvatar;
+        TextView tvName, tvTime, tvComment;
+
+        public CommentRecyclerViewHolder(View itemView) {
+            super(itemView);
+            ivAvatar = (ImageView) itemView.findViewById(R.id.imageViewAvatarComment);
+            tvName = (TextView) itemView.findViewById(R.id.textViewNameComment);
+            tvTime = (TextView) itemView.findViewById(R.id.textViewTimeComment);
+            tvComment = (TextView) itemView.findViewById(R.id.textViewComment);
+        }
     }
 
 //    private void retrieveUsers(){

@@ -25,9 +25,9 @@ public class PopupInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
     private View view = null;
     private LayoutInflater inflater = null;
     private HashMap<String, Uri> images = null;
-    private Context ctxt=null;
-    private int iconWidth=-1;
-    private int iconHeight=-1;
+    private Context ctxt = null;
+    private int iconWidth = -1;
+    private int iconHeight = -1;
     private Marker lastMarker = null;
 
     public PopupInfoWindowAdapter(Context ctxt, LayoutInflater inflater, HashMap<String, Uri> images) {
@@ -48,37 +48,37 @@ public class PopupInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
     @Override
     public View getInfoContents(Marker marker) {
         if (view == null) {
-            view =inflater.inflate(R.layout.custom_info_window, null);
+            view = inflater.inflate(R.layout.custom_info_window, null);
         }
 
         if (lastMarker == null || !lastMarker.getId().equals(marker.getId())) {
-            lastMarker=marker;
+            lastMarker = marker;
 
-            TextView tv=(TextView) view.findViewById(R.id.tvTitle);
+            TextView tv = (TextView) view.findViewById(R.id.tvTitle);
 
             tv.setText(marker.getTitle());
-            tv=(TextView) view.findViewById(R.id.tvDesc);
-            tv.setText(marker.getSnippet());
+            tv = (TextView) view.findViewById(R.id.tvDesc);
+            tv.setText(marker.getSnippet() + " - " + marker.getTag());
 
-            Uri image=images.get(marker.getId());
-            ImageView icon=(ImageView) view.findViewById(R.id.imgMarker);
+            Uri image = images.get(marker.getId());
+            ImageView icon = (ImageView) view.findViewById(R.id.imgMarker);
 
 
-            Picasso.with(ctxt).load(image).resize(iconWidth,iconHeight)
+            Picasso.with(ctxt).load(image).resize(iconWidth, iconHeight)
                     .noFade()
                     .placeholder(R.drawable.placeholder)
                     .centerCrop()
                     .into(icon, new MarkerCallback(marker));
         }
 
-        return(view);
+        return (view);
     }
 
     static class MarkerCallback implements Callback {
-        Marker marker=null;
+        Marker marker = null;
 
         MarkerCallback(Marker marker) {
-            this.marker=marker;
+            this.marker = marker;
         }
 
         @Override

@@ -36,16 +36,13 @@
         <Spinner
             android:id="@+id/spinnerCate"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:prompt="@string/loai_o_nhiem"
-            android:spinnerMode="dialog" />
+            android:layout_height="wrap_content" />
 
         <EditText
             android:id="@+id/editTextSubmitTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="input title"
-            android:inputType="text" />
+            android:hint="input title" />
 
         <EditText
             android:id="@+id/editTextSubmitDesc"
@@ -53,14 +50,13 @@
             android:layout_height="150dp"
             android:gravity="start"
             android:hint="input description"
-            android:inputType="text"
             android:scrollbars="vertical" />
 
         <Button
             android:id="@+id/buttonSubmit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right|bottom"
+            android:layout_gravity="right"
             android:text="Submit" />
 
     </LinearLayout>

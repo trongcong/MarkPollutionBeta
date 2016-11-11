@@ -2,6 +2,7 @@ package com.project.markpollution.CustomAdapter;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.project.markpollution.Interfaces.OnItemClickListener;
 import com.project.markpollution.Objects.PollutionPoint;
 import com.project.markpollution.R;
 import com.squareup.picasso.Picasso;
@@ -25,6 +27,9 @@ import java.util.List;
 public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerViewAdapter.FeedRecyclerViewHolder> {
     private Context context;
     private List<PollutionPoint> listPo;
+    //    private String url_CountCommentByPo = "http://indi.com.vn/dev/markpollution/CountCommentByPo.php?id_po=";
+//    private String url_SumRateByPo = "http://indi.com.vn/dev/markpollution/SumRateByPo.php?id_po=";
+    private OnItemClickListener onItemClickListener;
 
     public FeedRecyclerViewAdapter(Context context, List<PollutionPoint> listPo) {
         this.context = context;
@@ -33,17 +38,26 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
 
     @Override
     public FeedRecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_recyclerview_feed, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_recyclerview_feed2, parent, false);
         return new FeedRecyclerViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(FeedRecyclerViewHolder holder, int position) {
-        PollutionPoint curPo = listPo.get(position);
-        holder.tvTime.setText(formatDateTime(curPo.getTime()));
-        Picasso.with(context).load(Uri.parse(curPo.getImage())).into(holder.ivPicture);
+        final PollutionPoint curPo = listPo.get(position);
+        setCateIcon(curPo.getId_cate(), holder.ivCate);
         holder.tvTitle.setText(curPo.getTitle());
+        holder.tvTime.setText(formatDateTime(curPo.getTime()));
         holder.tvDesc.setText(curPo.getDesc());
+        Picasso.with(context).load(Uri.parse(curPo.getImage())).placeholder(R.drawable.placeholder).into(holder.ivPicture);
+
+        View.OnClickListener clickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onItemClickListener.onItemClick(curPo);
+            }
+        };
+        holder.container.setOnClickListener(clickListener);
     }
 
     @Override
@@ -51,25 +65,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         return listPo.size();
     }
 
-    class FeedRecyclerViewHolder extends RecyclerView.ViewHolder{
-        ImageView ivAvatar, ivPicture, ivComment, ivRate;
-        TextView tvTitle, tvTime, tvDesc, tvComment, tvRate;
-
-        public FeedRecyclerViewHolder(View itemView) {
-            super(itemView);
-            ivAvatar = (ImageView) itemView.findViewById(R.id.imageViewAvatarFeed);
-            ivPicture = (ImageView) itemView.findViewById(R.id.imageViewPictureFeed);
-            ivComment = (ImageView) itemView.findViewById(R.id.imageViewCommentFeed);
-            ivRate = (ImageView) itemView.findViewById(R.id.imageViewRateFeed);
-            tvTitle = (TextView) itemView.findViewById(R.id.textViewTitleFeed);
-            tvTime = (TextView) itemView.findViewById(R.id.textViewTimeFeed);
-            tvDesc = (TextView) itemView.findViewById(R.id.textViewDescFeed);
-            tvComment = (TextView) itemView.findViewById(R.id.textViewCommentFeed);
-            tvRate = (TextView) itemView.findViewById(R.id.textViewRateFeed);
-        }
-    }
-
-    private String formatDateTime(String time){
+    private String formatDateTime(String time) {
         SimpleDateFormat originFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         SimpleDateFormat resultFormat = new SimpleDateFormat("hh:mm:ss dd/MM/yyyy");
 
@@ -81,5 +77,84 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         }
 
         return resultFormat.format(datetime);
+    }
+
+    private void setCateIcon(String cateID, ImageView holder) {
+        switch (cateID) {
+            case "1":
+                holder.setImageResource(R.drawable.land_icon);
+                break;
+            case "2":
+                holder.setImageResource(R.drawable.water);
+                break;
+            case "3":
+                holder.setImageResource(R.drawable.air_icon);
+                break;
+            case "4":
+                holder.setImageResource(R.drawable.thermal_icon);
+                break;
+            case "5":
+                holder.setImageResource(R.drawable.light_icon);
+                break;
+            case "6":
+                holder.setImageResource(R.drawable.noise_icon);
+                break;
+        }
+    }
+
+//    private void setCountCommentByPo(String id_po, final TextView ivHolder){
+//        StringRequest strReq = new StringRequest(Request.Method.GET, url_CountCommentByPo +
+//                id_po, new Response.Listener<String>() {
+//            @Override
+//            public void onResponse(String response) {
+//                if(!response.equals("Count comment failure")){
+//                    ivHolder.setText(response);
+//                }
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                Toast.makeText(context, error.getMessage(), Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//
+//        Volley.newRequestQueue(context).add(strReq);
+//    }
+
+//    private void setSumRateByPo(String id_po, final TextView tvHolder){
+//        StringRequest strReq = new StringRequest(Request.Method.GET, url_SumRateByPo + id_po , new
+//                Response.Listener<String>() {
+//                    @Override
+//                    public void onResponse(String response) {
+//                        tvHolder.setText(response);
+//                    }
+//                }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                Toast.makeText(context, error.getMessage(), Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//
+//        Volley.newRequestQueue(context).add(strReq);
+//    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
+
+    class FeedRecyclerViewHolder extends RecyclerView.ViewHolder {
+        ImageView ivCate, ivPicture;
+        TextView tvTitle, tvTime, tvDesc;
+        CardView container;
+
+        public FeedRecyclerViewHolder(View itemView) {
+            super(itemView);
+            ivCate = (ImageView) itemView.findViewById(R.id.ivCateFeed);
+            ivPicture = (ImageView) itemView.findViewById(R.id.ivPictureFeed);
+            tvTitle = (TextView) itemView.findViewById(R.id.tvTitleFeed);
+            tvTime = (TextView) itemView.findViewById(R.id.tvTimeFeed);
+            tvDesc = (TextView) itemView.findViewById(R.id.tvDescFeed);
+            container = (CardView) itemView.findViewById(R.id.card_view_feed);
+        }
     }
 }

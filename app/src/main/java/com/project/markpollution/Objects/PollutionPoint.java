@@ -8,6 +8,7 @@ import com.google.maps.android.clustering.ClusterItem;
  */
 
 public class PollutionPoint implements ClusterItem {
+    private LatLng mPosition;
     private String id;
     private String id_cate;
     private String id_user;
@@ -18,7 +19,9 @@ public class PollutionPoint implements ClusterItem {
     private String image;
     private String time;
 
-    private final LatLng mPosition;
+    public PollutionPoint() {
+
+    }
 
     public PollutionPoint(String id, String id_cate, String id_user, double lat, double lng, String title, String desc, String image, String time) {
         this.id = id;
