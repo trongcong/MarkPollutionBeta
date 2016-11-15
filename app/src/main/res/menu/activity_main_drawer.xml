@@ -11,6 +11,10 @@
             android:icon="@drawable/ic_menu_slideshow"
             android:title="Nearby Pollutions" />
         <item
+            android:id="@+id/nav_showHeatMaps"
+            android:icon="@drawable/ic_menu_heatmaps"
+            android:title="Hot location map pollution" />
+        <item
             android:id="@+id/nav_seriousPo"
             android:icon="@drawable/ic_menu_manage"
             android:title="Serious Pollutions" />

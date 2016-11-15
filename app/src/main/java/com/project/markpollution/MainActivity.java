@@ -59,6 +59,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.TileOverlay;
+import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -68,6 +70,7 @@ import com.google.maps.android.SphericalUtil;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.heatmaps.HeatmapTileProvider;
 import com.project.markpollution.CustomAdapter.CircleTransform;
 import com.project.markpollution.CustomAdapter.FeedRecyclerViewAdapter;
 import com.project.markpollution.CustomAdapter.PollutionRenderer;
@@ -113,10 +116,7 @@ public class MainActivity extends AppCompatActivity
     private TextView tvRefresh;
     private SlidingDrawer simpleSlidingDrawer;
     private List<Category> listCate;
-    private List<PollutionPoint> listPoByCateID;
-    private List<PollutionPoint> listSeriousPo;
-    private List<PollutionPoint> listRecentPo;
-    private List<PollutionPoint> listNearbyPo;
+    private List<PollutionPoint> listPoByCateID, listSeriousPo, listRecentPo, listNearbyPo;
     private HashMap<String, Uri> images = new HashMap<>();
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
@@ -135,6 +135,8 @@ public class MainActivity extends AppCompatActivity
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest locationRequest;
     private Location curLocation;
+    private HeatmapTileProvider mProvider;
+    private TileOverlay mOverlay;
 
     private ClusterManager<PollutionPoint> mClusterManager;
 
@@ -155,12 +157,10 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
         fab = (FloatingActionButton) findViewById(R.id.fab);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
         navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         imgGetLocation = (ImageView) findViewById(R.id.imgGetLocation);
         spnCate = (Spinner) findViewById(R.id.spnCateMap);
@@ -189,6 +189,7 @@ public class MainActivity extends AppCompatActivity
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference();
 
+        navigationView.setNavigationItemSelectedListener(this);
         mapFragment.getMapAsync(this);
         fab.setOnClickListener(this);
     }
@@ -299,6 +300,19 @@ public class MainActivity extends AppCompatActivity
 
     private void addMarker(GoogleMap map, PollutionPoint po) {
         listLatLngsCamUpdate.add(new LatLng(po.getLat(), po.getLng()));
+    }
+
+    private void showHeatMaps() {
+        mMap.clear();
+        mClusterManager.clearItems();
+        listLatLngsCamUpdate = new ArrayList<>();
+        for (PollutionPoint po : listPo) {
+            listLatLngsCamUpdate.add(new LatLng(po.getLat(), po.getLng()));
+        }
+        mProvider = new HeatmapTileProvider.Builder().data(listLatLngsCamUpdate).radius(15).build();
+        mOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+
+        cameraViewAllCluster(listLatLngsCamUpdate);
     }
 
     private void getPollutionByCateID(String CateId) {
@@ -482,7 +496,7 @@ public class MainActivity extends AppCompatActivity
         feedAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(PollutionPoint po) {
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(po.getLat(), po.getLng()), 12));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(po.getLat(), po.getLng()), 17));
                 simpleSlidingDrawer.close();
             }
         });
@@ -662,10 +676,11 @@ public class MainActivity extends AppCompatActivity
             startActivity(new Intent(this, ReportManagementActivity.class));
         } else if (id == R.id.nav_nearbyPo) {
             getNearByPollution();
+        } else if (id == R.id.nav_showHeatMaps) {
+            showHeatMaps();
         } else if (id == R.id.nav_seriousPo) {
             getSeriousPollution();
         } else if (id == R.id.nav_share) {
-
         } else if (id == R.id.nav_send) {
 
         }
